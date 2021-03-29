@@ -7,7 +7,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -63,24 +62,10 @@ public class EditTitleActivity extends AppCompatActivity {
               .alpha(1f)
               .setDuration(500L)
               .start();
-//      editTextTitle.requestFocus();
 
-//      InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//      imm.hideSoftInputFromWindow(textViewTitle.getWindowToken(), 0);
-
-
-      /*
-      TODO:
-      1. animate out the "start edit" FAB
-      2. animate in the "done edit" FAB
-      3. hide the static title (text-view)
-      4. show the editable title (edit-text)
-      5. make sure the editable title's text is the same as the static one
-      6. optional (HARD!) make the keyboard to open with the edit-text focused,
-          so the user can start typing without the need another click on the edit-text
-
-      to complete (1.) & (2.), start by just changing visibility. only add animations after everything else is ready
-       */
+      // make the keyboard to open with the edit-text focused
+      editTextTitle.requestFocus();
+      showSoftKeyboard(editTextTitle);
     });
 
     // handle clicks on "done edit"
@@ -117,22 +102,15 @@ public class EditTitleActivity extends AppCompatActivity {
               .setDuration(500L)
               .start();
 
-      /*
-      TODO:
-      1. animate out the "done edit" FAB
-      2. animate in the "start edit" FAB
-      3. take the text from the user's input in the edit-text and put it inside the static text-view
-      4. show the static title (text-view)
-      5. hide the editable title (edit-text)
-      6. make sure that the keyboard is closed
-
-      to complete (1.) & (2.), start by just changing visibility. only add animations after everything else is ready
-       */
+      // close the keyboard
+      hideSoftKeyboard(editTextTitle);
     });
   }
 
   @Override
   public void onBackPressed() {
+    // BACK button was clicked
+
     // find all views
     FloatingActionButton fabStartEdit = findViewById(R.id.fab_start_edit);
     FloatingActionButton fabEditDone = findViewById(R.id.fab_edit_done);
@@ -168,25 +146,26 @@ public class EditTitleActivity extends AppCompatActivity {
               .alpha(1f)
               .setDuration(500L)
               .start();
+
     }
     else{
       super.onBackPressed();
     }
-    // BACK button was clicked
-    /*
-    TODO:
-    if user is now editing, tap on BACK will revert the edit. do the following:
-    1. hide the edit-text
-    2. show the static text-view with previous text (discard user's input)
-    3. animate out the "done-edit" FAB
-    4. animate in the "start-edit" FAB
-
-    else, the user isn't editing. continue normal BACK tap behavior to exit the screen.
-    call `super.onBackPressed()`
-
-    notice:
-    to work with views, you will need to find them first.
-    to find views call `findViewById()` in a same way like in `onCreate()`
-     */
   }
+
+  // this function opens the keyboard
+  private void showSoftKeyboard(View view) {
+    if (view.requestFocus()) {
+      InputMethodManager imm = (InputMethodManager)
+              getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+    }
+  }
+
+  // this function closes the keyboard
+  public void hideSoftKeyboard(View view){
+    InputMethodManager imm =(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+  }
+
 }
